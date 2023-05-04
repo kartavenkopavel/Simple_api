@@ -1,7 +1,7 @@
-package simple.Repository;
+package simple.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import simple.Entity.Employee;
+import simple.entity.Employee;
 
 public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 }

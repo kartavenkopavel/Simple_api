@@ -1,8 +1,10 @@
-package simple.Entity;
+package simple.entity;
 
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Builder
@@ -16,7 +18,8 @@ public class Post {
     public static final String ID_FIELD = "id";
     public static final String TITLE_FIELD = "title";
     public static final String DESCRIPTION_FIELD = "description";
-    public static final String EMPLOYEE_FIELD = "employee";
+    public static final String USER_FIELD = "employee";
+    public static final String COMMENT_FIELD = "comment";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,12 +27,18 @@ public class Post {
     private Long id;
 
     @Column(name = TITLE_FIELD, length = 50)
+    @NonNull
     private String title;
 
     @Column(name = DESCRIPTION_FIELD, length = 1000)
     private String description;
 
     @ManyToOne
-    @JoinColumn(name = EMPLOYEE_FIELD)
+    @JoinColumn(name = USER_FIELD)
+    @NonNull
     private Employee employee;
+
+    @OneToMany
+    @JoinColumn(name = COMMENT_FIELD)
+    private List<Comment> comment;
 }

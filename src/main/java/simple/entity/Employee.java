@@ -1,4 +1,4 @@
-package simple.Entity;
+package simple.entity;
 
 import lombok.*;
 
@@ -25,9 +25,11 @@ public class Employee {
     private Long id;
 
     @Column(name = NAME_FIELD, length = 20)
+    @NonNull
     private String name;
 
     @Column(name = LAST_NAME_FIELD, length = 100)
+    @NonNull
     private String lastName;
 
     @Column(name = CREATED_AT_FIELD)

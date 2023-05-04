@@ -1,8 +1,8 @@
-package simple.Repository;
+package simple.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import simple.Entity.Employee;
-import simple.Entity.Post;
+import simple.entity.Employee;
+import simple.entity.Post;
 
 import java.util.List;
 
