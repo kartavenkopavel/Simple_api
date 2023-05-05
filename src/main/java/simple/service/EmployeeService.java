@@ -23,7 +23,7 @@ public class EmployeeService {
     public ResponseEntity<?> createUser(Employee employee) {
         if (employee.getName() == null || employee.getLastName() == null) {
             Map<String, String> errorResponse = new HashMap<>();
-            errorResponse.put("error", "Name and Last name fields is required");
+            errorResponse.put("error", "The 'name' and 'lastName' fields is required");
             return ResponseEntity.badRequest().body(errorResponse);
         }
         employee.setId(null);

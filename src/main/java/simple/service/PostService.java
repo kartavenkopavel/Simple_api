@@ -28,12 +28,12 @@ public class PostService {
     public ResponseEntity<?> createPost(Post post) {
         if (post.getTitle() == null) {
             Map<String, String> errorResponse = new HashMap<>();
-            errorResponse.put("error", "Title field is required");
+            errorResponse.put("error", "The 'title' field is required");
             return ResponseEntity.badRequest().body(errorResponse);
         }
         if (post.getEmployee() == null || post.getEmployee().getId() == null) {
             Map<String, String> errorResponse = new HashMap<>();
-            errorResponse.put("error", "User field is required");
+            errorResponse.put("error", "The 'id' field is required");
             return ResponseEntity.badRequest().body(errorResponse);
         }
 

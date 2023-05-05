@@ -26,7 +26,7 @@ public class CommentService {
     public ResponseEntity<?> createComment(Comment comment) {
         if (comment.getText() == null) {
             Map<String, String> errorResponse = new HashMap<>();
-            errorResponse.put("error", "Text field is required");
+            errorResponse.put("error", "The 'text' field is required");
             return ResponseEntity.badRequest().body(errorResponse);
         }
 
