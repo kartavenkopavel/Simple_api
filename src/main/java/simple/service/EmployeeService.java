@@ -19,7 +19,7 @@ public class EmployeeService {
     @Autowired
     private EmployeeRepository employeeRepository;
 
-    public ResponseEntity<?> createUser(Employee employee) {
+    public ResponseEntity<?> createEmployee(Employee employee) {
         Map<String, String> errorResponse = new HashMap<>();
         if (employee.getName() == null || employee.getLastName() == null) {
             errorResponse.put("error", "The 'name' and 'lastName' fields is required");
@@ -40,17 +40,17 @@ public class EmployeeService {
         return ResponseEntity.status(HttpStatus.CREATED).body(savedEmployee);
     }
 
-    public List<Employee> getUserList() {
+    public List<Employee> getEmployeeList() {
         return employeeRepository.findAll();
     }
 
-    public Employee getUserById(Long id) {
+    public Employee getEmployeeById(Long id) {
         return employeeRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
-    public ResponseEntity<?> updateUser(Employee employee) {
-        getUserById(employee.getId());
+    public ResponseEntity<?> updateEmployee(Employee employee) {
+        getEmployeeById(employee.getId());
 
         Map<String, String> errorResponse = new HashMap<>();
         if (employee.getName().length() > 20) {
@@ -67,27 +67,27 @@ public class EmployeeService {
         return ResponseEntity.status(HttpStatus.OK).body(savedEmployee);
     }
 
-    public ResponseEntity<?> editUser(Map<String, Object> userMap, Long id) {
-        Employee employee = getUserById(id);
+    public ResponseEntity<?> editEmployee(Map<String, Object> employeeMap, Long id) {
+        Employee employee = getEmployeeById(id);
 
         Map<String, String> errorResponse = new HashMap<>();
-        if (!userMap.get(Employee.NAME_FIELD).equals(10)) {
+        if (!employeeMap.get(Employee.NAME_FIELD).equals(10)) {
             errorResponse.put("error", "The 'name' field length should be less then 20 characters");
             return ResponseEntity.badRequest().body(errorResponse);
         }
-        if (!userMap.get(Employee.LAST_NAME_FIELD).equals(100)) {
+        if (!employeeMap.get(Employee.LAST_NAME_FIELD).equals(100)) {
             errorResponse.put("error", "The 'lastName' field length should be less then 100 characters");
             return ResponseEntity.badRequest().body(errorResponse);
         }
 
-        for (String key : userMap.keySet()) {
+        for (String key : employeeMap.keySet()) {
             switch (key) {
                 case Employee.NAME_FIELD:
-                    employee.setName((String) userMap.get(Employee.NAME_FIELD));
+                    employee.setName((String) employeeMap.get(Employee.NAME_FIELD));
                     break;
 
                 case Employee.LAST_NAME_FIELD:
-                    employee.setLastName((String) userMap.get(Employee.LAST_NAME_FIELD));
+                    employee.setLastName((String) employeeMap.get(Employee.LAST_NAME_FIELD));
                     break;
             }
         }

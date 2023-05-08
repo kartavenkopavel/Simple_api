@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import simple.entity.Comment;
-import simple.entity.Post;
+import simple.entity.Issue;
 import simple.repository.CommentRepository;
 
 import java.util.HashMap;
@@ -16,7 +16,7 @@ import java.util.Map;
 public class CommentService {
 
     @Autowired
-    private PostService postService;
+    private IssueService issueService;
 
     @Autowired
     private CommentRepository commentRepository;
@@ -32,15 +32,15 @@ public class CommentService {
             return ResponseEntity.badRequest().body(errorResponse);
         }
 
-        Post post = postService.getPostById(comment.getPost().getId());
-        comment.setPost(post);
+        Issue issue = issueService.getIssueById(comment.getIssue().getId());
+        comment.setIssue(issue);
         Comment savedComment = commentRepository.save(comment);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(savedComment);
     }
 
-    public List<Comment> getPostComments(Long id) {
-        Post post = postService.getPostById(id);
-        return commentRepository.findByPost(post);
+    public List<Comment> getIssueComments(Long id) {
+        Issue issue = issueService.getIssueById(id);
+        return commentRepository.findByIssue(issue);
     }
 }

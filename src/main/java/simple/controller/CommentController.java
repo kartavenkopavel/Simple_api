@@ -26,7 +26,7 @@ public class CommentController {
             tags = {"Comment"},
             operationId = "comment",
             summary = "Create new comment",
-            description = "Before creating a comment, you need to create a post",
+            description = "Before creating a comment, you need to create a issue",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
             content = @Content(schema = @Schema(implementation = CommentRequest.class))),
             responses = {
@@ -45,7 +45,7 @@ public class CommentController {
     @Operation(
             tags = {"Comment"},
             operationId = "id",
-            summary = "Getting comments on a post",
+            summary = "Getting comments on a issue",
             parameters = {@Parameter(name = "id", example = "1")},
             responses = {
                     @ApiResponse(
@@ -55,7 +55,7 @@ public class CommentController {
                     )
             }
     )
-    public List<Comment> getPostComments(@PathVariable Long id) {
-        return commentService.getPostComments(id);
+    public List<Comment> getIssueComments(@PathVariable Long id) {
+        return commentService.getIssueComments(id);
     }
 }

@@ -12,7 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
-public class Post {
+public class Issue {
 
     public static final String ID_FIELD = "id";
     public static final String TITLE_FIELD = "title";

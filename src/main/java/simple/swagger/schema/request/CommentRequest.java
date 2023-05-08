@@ -10,5 +10,5 @@ public class CommentRequest {
     @Schema(example = "Some text", maxLength = 400)
     private String text;
     private int likes;
-    private PostRequest post;
+    private IssueRequest issue;
 }
