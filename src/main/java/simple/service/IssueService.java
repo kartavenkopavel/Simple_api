@@ -6,8 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import simple.entity.Employee;
-import simple.entity.Post;
-import simple.repository.PostRepository;
+import simple.entity.Issue;
+import simple.repository.IssueRepository;
 
 import java.util.HashMap;
 import java.util.List;
@@ -16,66 +16,66 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class PostService {
+public class IssueService {
 
     @Autowired
-    private PostRepository postRepository;
+    private IssueRepository issueRepository;
 
     @Autowired
     private EmployeeService employeeService;
 
-    public ResponseEntity<?> createPost(Post post) {
-        if (post.getTitle() == null) {
+    public ResponseEntity<?> createIssue(Issue issue) {
+        if (issue.getTitle() == null) {
             Map<String, String> errorResponse = new HashMap<>();
             errorResponse.put("error", "The 'title' field is required");
             return ResponseEntity.badRequest().body(errorResponse);
         }
-        if (post.getEmployee() == null || post.getEmployee().getId() == null) {
+        if (issue.getEmployee() == null || issue.getEmployee().getId() == null) {
             Map<String, String> errorResponse = new HashMap<>();
             errorResponse.put("error", "The 'id' field is required");
             return ResponseEntity.badRequest().body(errorResponse);
         }
 
-        Employee employee = employeeService.getUserById(post.getEmployee().getId());
-        post.setEmployee(employee);
+        Employee employee = employeeService.getEmployeeById(issue.getEmployee().getId());
+        issue.setEmployee(employee);
 
-        Post savedPost = postRepository.save(post);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedPost);
+        Issue savedIssue = issueRepository.save(issue);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedIssue);
     }
 
-    public Post getPostById(Long id) {
-        return postRepository.findById(id)
+    public Issue getIssueById(Long id) {
+        return issueRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
-    public List<Post> getUserPosts(Long id) {
-        Employee employee = employeeService.getUserById(id);
+    public List<Issue> getEmployeeIssues(Long id) {
+        Employee employee = employeeService.getEmployeeById(id);
 
-        return postRepository.findByEmployee(employee);
+        return issueRepository.findByEmployee(employee);
     }
 
-    public List<Post> search(String query) {
-        List<Post> postList = postRepository.findAll();
+    public List<Issue> search(String query) {
+        List<Issue> issueList = issueRepository.findAll();
         String lowerCaseQuery = query.toLowerCase();
 
-        postList = postList.stream()
+        issueList = issueList.stream()
                 .filter(post -> post.getTitle().toLowerCase().contains(lowerCaseQuery) ||
                     post.getDescription().toLowerCase().contains(lowerCaseQuery) ||
                     post.getEmployee().getName().toLowerCase().contains(lowerCaseQuery) ||
                     post.getEmployee().getLastName().toLowerCase().contains(lowerCaseQuery))
                 .collect(Collectors.toList());
 
-        return postList;
+        return issueList;
     }
 
-    public List<Post> getPostList() {
-        return postRepository.findAll();
+    public List<Issue> getIssueList() {
+        return issueRepository.findAll();
     }
 
     public ResponseEntity<Void> remove(Long id) {
-        Optional<Post> optionalPost = postRepository.findById(id);
+        Optional<Issue> optionalPost = issueRepository.findById(id);
         if (optionalPost.isPresent()) {
-            postRepository.deleteById(id);
+            issueRepository.deleteById(id);
             return ResponseEntity.ok().build();
         } else {
             return ResponseEntity.notFound().build();

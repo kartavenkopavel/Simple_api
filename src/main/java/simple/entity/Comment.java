@@ -1,6 +1,5 @@
 package simple.entity;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import javax.persistence.*;
@@ -32,6 +31,6 @@ public class Comment {
 
     @ManyToOne
     @JoinColumn(name = POST_FIELD)
-    private Post post;
+    private Issue issue;
 
 }

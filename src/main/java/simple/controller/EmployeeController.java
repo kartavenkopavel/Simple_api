@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("api/user")
+@RequestMapping("api/employee")
 public class EmployeeController {
 
     @Autowired
@@ -32,7 +32,7 @@ public class EmployeeController {
             )
     )
     public List<Employee> getList() {
-        return employeeService.getUserList();
+        return employeeService.getEmployeeList();
     }
 
     @GetMapping("/{id}")
@@ -47,7 +47,7 @@ public class EmployeeController {
             )
     )
     public Employee getById(@PathVariable Long id) {
-        return employeeService.getUserById(id);
+        return employeeService.getEmployeeById(id);
     }
 
     @PostMapping("/create")
@@ -65,7 +65,7 @@ public class EmployeeController {
             )
     )
     public ResponseEntity<?> create(@RequestBody Employee employee) {
-        return employeeService.createUser(employee);
+        return employeeService.createEmployee(employee);
     }
 
     @PutMapping("/update")
@@ -83,7 +83,7 @@ public class EmployeeController {
             )
     )
     public ResponseEntity<?> update(@RequestBody Employee employee) {
-        return employeeService.updateUser(employee);
+        return employeeService.updateEmployee(employee);
     }
 
     @PatchMapping("/edit/{id}")
@@ -101,7 +101,7 @@ public class EmployeeController {
             )
     )
     public ResponseEntity<?> edit(@RequestBody Map<String, Object> employeeMap, @PathVariable Long id) {
-        return employeeService.editUser(employeeMap, id);
+        return employeeService.editEmployee(employeeMap, id);
     }
 
     @DeleteMapping("/delete/{id}")

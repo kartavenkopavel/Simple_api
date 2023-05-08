@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class PostRequest {
+public class IssueRequest {
     @Schema(required = true, example = "1")
     private Long id;
     @Schema(maxLength = 100)
