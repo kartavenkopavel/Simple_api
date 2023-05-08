@@ -23,6 +23,12 @@ public class SecurityConfig {
     @Value("${app.http.auth-token}")
     private String principalRequestValue;
 
+    private static final String[] PUBLIC_URL = {
+            "/h2-console/**",
+            "/v3/api-docs/**",
+            "/swagger-ui/**"
+    };
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         ApiKeyAuthFilter filter = new ApiKeyAuthFilter(principalRequestHeader);
@@ -36,7 +42,7 @@ public class SecurityConfig {
                     authentication.setAuthenticated(true);
                     return authentication;
                 });
-        http.antMatcher("/**")
+        http.antMatcher("/api/**")
                 .csrf()
                 .disable()
                 .sessionManagement()
@@ -44,8 +50,14 @@ public class SecurityConfig {
                 .and()
                 .addFilter(filter)
                 .authorizeRequests()
+                .antMatchers(PUBLIC_URL)
+                .permitAll()
                 .anyRequest()
                 .authenticated();
+
+        http.headers()
+                .frameOptions()
+                .disable();
 
         return http.build();
     }

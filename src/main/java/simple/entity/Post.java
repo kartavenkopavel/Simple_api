@@ -3,7 +3,6 @@ package simple.entity;
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -26,7 +25,7 @@ public class Post {
     @Column(name = ID_FIELD)
     private Long id;
 
-    @Column(name = TITLE_FIELD, length = 50)
+    @Column(name = TITLE_FIELD, length = 100)
     @NonNull
     private String title;
 

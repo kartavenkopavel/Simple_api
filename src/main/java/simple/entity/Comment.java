@@ -1,5 +1,6 @@
 package simple.entity;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import javax.persistence.*;
@@ -23,8 +24,7 @@ public class Comment {
     @Column(name = COMMENT_ID_FIELD)
     private Long id;
 
-    @Column(name = COMMENT_TEXT_FIELD)
-    @NonNull
+    @Column(name = COMMENT_TEXT_FIELD, length = 400)
     private String text;
 
     @Column(name = COMMENT_LIKES_FIELD)
