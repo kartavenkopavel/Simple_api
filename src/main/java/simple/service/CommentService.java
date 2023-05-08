@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import simple.dto.CommentDto;
 import simple.entity.Comment;
 import simple.entity.Post;
 import simple.repository.CommentRepository;
@@ -12,7 +11,6 @@ import simple.repository.CommentRepository;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 public class CommentService {
@@ -24,9 +22,13 @@ public class CommentService {
     private CommentRepository commentRepository;
 
     public ResponseEntity<?> createComment(Comment comment) {
+        Map<String, String> errorResponse = new HashMap<>();
         if (comment.getText() == null) {
-            Map<String, String> errorResponse = new HashMap<>();
             errorResponse.put("error", "The 'text' field is required");
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
+        if (comment.getText().length() > 400) {
+            errorResponse.put("error", "The 'text' field length should be less than 400 characters");
             return ResponseEntity.badRequest().body(errorResponse);
         }
 
@@ -34,21 +36,11 @@ public class CommentService {
         comment.setPost(post);
         Comment savedComment = commentRepository.save(comment);
 
-        CommentDto commentDto = CommentDto.builder()
-                .id(savedComment.getId())
-                .text(savedComment.getText())
-                .likes(savedComment.getLikes())
-                .build();
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(commentDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedComment);
     }
 
-    public List<CommentDto> getPostComments(Long id) {
+    public List<Comment> getPostComments(Long id) {
         Post post = postService.getPostById(id);
-        List<Comment> commentList = commentRepository.findByPost(post);
-
-        return commentList.stream()
-                .map(CommentDto::new)
-                .collect(Collectors.toList());
+        return commentRepository.findByPost(post);
     }
 }

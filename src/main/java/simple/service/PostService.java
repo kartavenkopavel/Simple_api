@@ -5,7 +5,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import simple.dto.PostDto;
 import simple.entity.Employee;
 import simple.entity.Post;
 import simple.repository.PostRepository;
@@ -41,14 +40,7 @@ public class PostService {
         post.setEmployee(employee);
 
         Post savedPost = postRepository.save(post);
-
-        PostDto postDto = PostDto.builder()
-                .id(savedPost.getId())
-                .title(savedPost.getTitle())
-                .description(savedPost.getDescription())
-                .build();
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(postDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedPost);
     }
 
     public Post getPostById(Long id) {
@@ -56,14 +48,10 @@ public class PostService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
-    public List<PostDto> getUserPosts(Long id) {
+    public List<Post> getUserPosts(Long id) {
         Employee employee = employeeService.getUserById(id);
 
-        List<Post> postList = postRepository.findByEmployee(employee);
-
-        return postList.stream()
-                .map(PostDto::new)
-                .collect(Collectors.toList());
+        return postRepository.findByEmployee(employee);
     }
 
     public List<Post> search(String query) {
@@ -80,12 +68,8 @@ public class PostService {
         return postList;
     }
 
-    public List<PostDto> getPostList() {
-        List<Post> postList = postRepository.findAll();
-
-        return postList.stream()
-                .map(PostDto::new)
-                .collect(Collectors.toList());
+    public List<Post> getPostList() {
+        return postRepository.findAll();
     }
 
     public ResponseEntity<Void> remove(Long id) {

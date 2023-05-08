@@ -8,7 +8,6 @@ import org.springframework.web.server.ResponseStatusException;
 import simple.entity.Employee;
 import simple.repository.EmployeeRepository;
 
-import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,15 +20,24 @@ public class EmployeeService {
     private EmployeeRepository employeeRepository;
 
     public ResponseEntity<?> createUser(Employee employee) {
+        Map<String, String> errorResponse = new HashMap<>();
         if (employee.getName() == null || employee.getLastName() == null) {
-            Map<String, String> errorResponse = new HashMap<>();
             errorResponse.put("error", "The 'name' and 'lastName' fields is required");
             return ResponseEntity.badRequest().body(errorResponse);
         }
+        if (employee.getName().length() > 20) {
+            errorResponse.put("error", "The 'name' field length should be less then 20 characters");
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
+        if (employee.getName().length() > 100) {
+            errorResponse.put("error", "The 'lastName' field length should be less then 100 characters");
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
+
         employee.setId(null);
         Employee savedEmployee = employeeRepository.save(employee);
-        return ResponseEntity.created(URI.create("/create/" + savedEmployee.getId()))
-                .body(savedEmployee);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedEmployee);
     }
 
     public List<Employee> getUserList() {
@@ -41,13 +49,36 @@ public class EmployeeService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
-    public Employee updateUser(Employee employee) {
+    public ResponseEntity<?> updateUser(Employee employee) {
         getUserById(employee.getId());
-        return employeeRepository.save(employee);
+
+        Map<String, String> errorResponse = new HashMap<>();
+        if (employee.getName().length() > 20) {
+            errorResponse.put("error", "The 'name' field length should be less then 20 characters");
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
+        if (employee.getName().length() > 100) {
+            errorResponse.put("error", "The 'lastName' field length should be less then 100 characters");
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
+
+        Employee savedEmployee = employeeRepository.save(employee);
+
+        return ResponseEntity.status(HttpStatus.OK).body(savedEmployee);
     }
 
-    public Employee editUser(Map<String, Object> userMap, Long id) {
+    public ResponseEntity<?> editUser(Map<String, Object> userMap, Long id) {
         Employee employee = getUserById(id);
+
+        Map<String, String> errorResponse = new HashMap<>();
+        if (!userMap.get(Employee.NAME_FIELD).equals(10)) {
+            errorResponse.put("error", "The 'name' field length should be less then 20 characters");
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
+        if (!userMap.get(Employee.LAST_NAME_FIELD).equals(100)) {
+            errorResponse.put("error", "The 'lastName' field length should be less then 100 characters");
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
 
         for (String key : userMap.keySet()) {
             switch (key) {
@@ -56,12 +87,14 @@ public class EmployeeService {
                     break;
 
                 case Employee.LAST_NAME_FIELD:
-                    employee.setName((String) userMap.get(Employee.LAST_NAME_FIELD));
+                    employee.setLastName((String) userMap.get(Employee.LAST_NAME_FIELD));
                     break;
             }
         }
 
-        return employeeRepository.save(employee);
+        Employee savedEmployee = employeeRepository.save(employee);
+
+        return ResponseEntity.status(HttpStatus.OK).body(savedEmployee);
     }
 
     public ResponseEntity<Void> remove(Long id) {
