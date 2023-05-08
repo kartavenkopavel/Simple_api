@@ -4,6 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.server.ResponseStatusException;
 import simple.entity.Employee;
 import simple.entity.Issue;
@@ -24,7 +27,7 @@ public class IssueService {
     @Autowired
     private EmployeeService employeeService;
 
-    public ResponseEntity<?> createIssue(Issue issue) {
+    public ResponseEntity<Object> createIssue(Issue issue) {
         if (issue.getTitle() == null) {
             Map<String, String> errorResponse = new HashMap<>();
             errorResponse.put("error", "The 'title' field is required");
@@ -46,6 +49,30 @@ public class IssueService {
     public Issue getIssueById(Long id) {
         return issueRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    }
+
+    public ResponseEntity<Object> editIssueDescription(Map<String, Object> issueMap, Long id) {
+        Issue issue = getIssueById(id);
+
+        if (issueMap.get(Issue.TITLE_FIELD) == null) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "The 'title' field is required");
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
+
+        for (String key : issueMap.keySet()) {
+            switch (key) {
+                case Issue.TITLE_FIELD:
+                    issue.setTitle((String) issueMap.get(Issue.TITLE_FIELD));
+                    break;
+                case Issue.DESCRIPTION_FIELD:
+                    issue.setDescription((String) issueMap.get(Issue.DESCRIPTION_FIELD));
+                    break;
+            }
+        }
+
+        Issue savedIssue = issueRepository.save(issue);
+        return ResponseEntity.status(HttpStatus.OK).body(savedIssue);
     }
 
     public List<Issue> getEmployeeIssues(Long id) {

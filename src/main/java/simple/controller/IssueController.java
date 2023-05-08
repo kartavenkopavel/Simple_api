@@ -13,9 +13,10 @@ import simple.service.IssueService;
 import simple.swagger.schema.request.IssueRequest;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
-@RequestMapping("api/post")
+@RequestMapping("api/issue")
 public class IssueController {
 
     @Autowired
@@ -37,7 +38,7 @@ public class IssueController {
                     )
             }
     )
-    public ResponseEntity<?> createIssue(@RequestBody Issue issue) {
+    public ResponseEntity<Object> createIssue(@RequestBody Issue issue) {
         return issueService.createIssue(issue);
     }
 
@@ -91,6 +92,25 @@ public class IssueController {
     )
     public Issue getById(@PathVariable Long id) {
         return issueService.getIssueById(id);
+    }
+
+    @PatchMapping("/edit/{id}")
+    @Operation(
+            tags = {"Issue"},
+            operationId = "issue",
+            summary = "Edit issue by id",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    content = @Content(schema = @Schema(implementation = IssueRequest.class))),
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "OK",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = Issue.class))
+                    )
+            }
+    )
+    public ResponseEntity<Object> edit(@RequestBody Map<String, Object> issueMap, @PathVariable Long id) {
+        return issueService.editIssueDescription(issueMap, id);
     }
 
     @GetMapping("/list")
