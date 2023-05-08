@@ -19,7 +19,7 @@ public class EmployeeService {
     @Autowired
     private EmployeeRepository employeeRepository;
 
-    public ResponseEntity<?> createEmployee(Employee employee) {
+    public ResponseEntity<Object> createEmployee(Employee employee) {
         Map<String, String> errorResponse = new HashMap<>();
         if (employee.getName() == null || employee.getLastName() == null) {
             errorResponse.put("error", "The 'name' and 'lastName' fields is required");
@@ -49,7 +49,7 @@ public class EmployeeService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
-    public ResponseEntity<?> updateEmployee(Employee employee) {
+    public ResponseEntity<Object> updateEmployee(Employee employee) {
         getEmployeeById(employee.getId());
 
         Map<String, String> errorResponse = new HashMap<>();
@@ -67,15 +67,18 @@ public class EmployeeService {
         return ResponseEntity.status(HttpStatus.OK).body(savedEmployee);
     }
 
-    public ResponseEntity<?> editEmployee(Map<String, Object> employeeMap, Long id) {
+    public ResponseEntity<Object> editEmployee(Map<String, Object> employeeMap, Long id) {
         Employee employee = getEmployeeById(id);
 
         Map<String, String> errorResponse = new HashMap<>();
-        if (!employeeMap.get(Employee.NAME_FIELD).equals(10)) {
+        String name = (String) employeeMap.get(Employee.NAME_FIELD);
+        if (name != null && name.length() > 20){
             errorResponse.put("error", "The 'name' field length should be less then 20 characters");
             return ResponseEntity.badRequest().body(errorResponse);
         }
-        if (!employeeMap.get(Employee.LAST_NAME_FIELD).equals(100)) {
+
+        String lastName = (String) employeeMap.get(Employee.LAST_NAME_FIELD);
+        if (lastName != null && lastName.length() > 100) {
             errorResponse.put("error", "The 'lastName' field length should be less then 100 characters");
             return ResponseEntity.badRequest().body(errorResponse);
         }

@@ -64,7 +64,7 @@ public class EmployeeController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = Employee.class))
             )
     )
-    public ResponseEntity<?> create(@RequestBody Employee employee) {
+    public ResponseEntity<Object> create(@RequestBody Employee employee) {
         return employeeService.createEmployee(employee);
     }
 
@@ -82,7 +82,7 @@ public class EmployeeController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = Employee.class))
             )
     )
-    public ResponseEntity<?> update(@RequestBody Employee employee) {
+    public ResponseEntity<Object> update(@RequestBody Employee employee) {
         return employeeService.updateEmployee(employee);
     }
 
@@ -100,7 +100,7 @@ public class EmployeeController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = Employee.class))
             )
     )
-    public ResponseEntity<?> edit(@RequestBody Map<String, Object> employeeMap, @PathVariable Long id) {
+    public ResponseEntity<Object> edit(@RequestBody Map<String, Object> employeeMap, @PathVariable Long id) {
         return employeeService.editEmployee(employeeMap, id);
     }
 

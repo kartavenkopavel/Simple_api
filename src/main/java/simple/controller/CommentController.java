@@ -41,7 +41,7 @@ public class CommentController {
        return commentService.createComment(comment);
     }
 
-    @GetMapping("/post/{id}/list")
+    @GetMapping("/issue/{id}/list")
     @Operation(
             tags = {"Comment"},
             operationId = "id",
@@ -57,5 +57,22 @@ public class CommentController {
     )
     public List<Comment> getIssueComments(@PathVariable Long id) {
         return commentService.getIssueComments(id);
+    }
+
+    @DeleteMapping("/{id}")
+    @Operation(
+            tags = {"Comment"},
+            operationId = "id",
+            summary = "Delete comment",
+            parameters = {@Parameter(name = "id", example = "1")},
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "OK"
+                    )
+            }
+    )
+    public ResponseEntity<Void> remove(@PathVariable Long id) {
+        return commentService.deleteComment(id);
     }
 }
