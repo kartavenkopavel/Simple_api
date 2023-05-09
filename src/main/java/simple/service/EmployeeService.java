@@ -29,7 +29,7 @@ public class EmployeeService {
             errorResponse.put("error", "The 'name' field length should be less then 20 characters");
             return ResponseEntity.badRequest().body(errorResponse);
         }
-        if (employee.getName().length() > 100) {
+        if (employee.getLastName().length() > 100) {
             errorResponse.put("error", "The 'lastName' field length should be less then 100 characters");
             return ResponseEntity.badRequest().body(errorResponse);
         }
