@@ -15,3 +15,5 @@ Application was created to test the API for educational purposes. Used stack: ja
 > http://localhost:8090/swagger-ui/index.html (public link)
 * Access to the database at
 > http://localhost:8090/h2-console/ (public link)
+* Or you can use a docker image
+> `docker pull pavelkartavenko/simple-api:1.0.0`
