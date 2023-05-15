@@ -59,7 +59,7 @@ public class IssueController {
         return issueService.getEmployeeIssues(id);
     }
 
-    @GetMapping("/search/{query}")
+    @GetMapping("/search")
     @Operation(
             tags = {"Issue"},
             operationId = "query",
@@ -72,7 +72,7 @@ public class IssueController {
                     )
             }
     )
-    public List<Issue> search(@PathVariable String query) {
+    public List<Issue> search(@RequestParam("q") String query) {
         return issueService.search(query);
     }
 
