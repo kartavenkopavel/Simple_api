@@ -3,6 +3,7 @@ package simple.entity;
 import lombok.*;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 @Entity
@@ -25,11 +26,11 @@ public class Employee {
     private Long id;
 
     @Column(name = NAME_FIELD, length = 20)
-    @NonNull
+    @Size(min = 1, message = "The 'name' field must have at least then 1 character")
     private String name;
 
     @Column(name = LAST_NAME_FIELD, length = 100)
-    @NonNull
+    @Size(min = 1, message = "The 'lastName' field must have at least then 1 character")
     private String lastName;
 
     @Column(name = CREATED_AT_FIELD)

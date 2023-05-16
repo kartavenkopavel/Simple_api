@@ -8,10 +8,11 @@ import org.springframework.web.server.ResponseStatusException;
 import simple.entity.Employee;
 import simple.repository.EmployeeRepository;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import static simple.service.ServiceUtils.*;
 
 @Service
 public class EmployeeService {
@@ -20,18 +21,25 @@ public class EmployeeService {
     private EmployeeRepository employeeRepository;
 
     public ResponseEntity<Object> createEmployee(Employee employee) {
-        Map<String, String> errorResponse = new HashMap<>();
         if (employee.getName() == null || employee.getLastName() == null) {
-            errorResponse.put("error", "The 'name' and 'lastName' fields is required");
-            return ResponseEntity.badRequest().body(errorResponse);
+            return ResponseEntity.badRequest()
+                    .body(createErrorResponse("The 'name' and 'lastName' fields is required"));
+        }
+        if (employee.getName().length() < 1) {
+            return ResponseEntity.badRequest()
+                    .body(createErrorResponse("The 'name' field must have at least then 1 character"));
+        }
+        if (employee.getLastName().length() < 1) {
+            return ResponseEntity.badRequest()
+                    .body(createErrorResponse("The 'lastName' field must have at least then 1 character"));
         }
         if (employee.getName().length() > 20) {
-            errorResponse.put("error", "The 'name' field length should be less then 20 characters");
-            return ResponseEntity.badRequest().body(errorResponse);
+            return ResponseEntity.badRequest()
+                    .body(createErrorResponse("The 'name' field length should be less then 20 characters"));
         }
         if (employee.getLastName().length() > 100) {
-            errorResponse.put("error", "The 'lastName' field length should be less then 100 characters");
-            return ResponseEntity.badRequest().body(errorResponse);
+            return ResponseEntity.badRequest()
+                    .body(createErrorResponse("The 'lastName' field length should be less then 100 characters"));
         }
 
         employee.setId(null);
@@ -40,8 +48,8 @@ public class EmployeeService {
         return ResponseEntity.status(HttpStatus.CREATED).body(savedEmployee);
     }
 
-    public List<Employee> getEmployeeList() {
-        return employeeRepository.findAll();
+    public ResponseEntity<List<Employee>> getEmployeeList() {
+        return ResponseEntity.ok().body(employeeRepository.findAll());
     }
 
     public Employee getEmployeeById(Long id) {
@@ -52,14 +60,25 @@ public class EmployeeService {
     public ResponseEntity<Object> updateEmployee(Employee employee) {
         getEmployeeById(employee.getId());
 
-        Map<String, String> errorResponse = new HashMap<>();
-        if (employee.getName().length() > 20) {
-            errorResponse.put("error", "The 'name' field length should be less then 20 characters");
-            return ResponseEntity.badRequest().body(errorResponse);
+        if (employee.getName() == null || employee.getLastName() == null) {
+            return ResponseEntity.badRequest()
+                    .body(createErrorResponse("The 'name' and 'lastName' fields is required"));
         }
-        if (employee.getName().length() > 100) {
-            errorResponse.put("error", "The 'lastName' field length should be less then 100 characters");
-            return ResponseEntity.badRequest().body(errorResponse);
+        if (employee.getName().length() < 1) {
+            return ResponseEntity.badRequest()
+                    .body(createErrorResponse("The 'name' field must have at least then 1 character"));
+        }
+        if (employee.getLastName().length() < 1) {
+            return ResponseEntity.badRequest()
+                    .body(createErrorResponse("The 'lastName' field must have at least then 1 character"));
+        }
+        if (employee.getName().length() > 20) {
+            return ResponseEntity.badRequest()
+                    .body(createErrorResponse("The 'name' field length should be less then 20 characters"));
+        }
+        if (employee.getLastName().length() > 100) {
+            return ResponseEntity.badRequest()
+                    .body(createErrorResponse("The 'lastName' field length should be less then 100 characters"));
         }
 
         Employee savedEmployee = employeeRepository.save(employee);
@@ -70,17 +89,24 @@ public class EmployeeService {
     public ResponseEntity<Object> editEmployee(Map<String, Object> employeeMap, Long id) {
         Employee employee = getEmployeeById(id);
 
-        Map<String, String> errorResponse = new HashMap<>();
         String name = (String) employeeMap.get(Employee.NAME_FIELD);
+        if (name != null && name.length() < 1) {
+            return ResponseEntity.badRequest()
+                    .body(createErrorResponse("The 'name' field must have at least then 1 character"));
+        }
         if (name != null && name.length() > 20){
-            errorResponse.put("error", "The 'name' field length should be less then 20 characters");
-            return ResponseEntity.badRequest().body(errorResponse);
+            return ResponseEntity.badRequest()
+                    .body(createErrorResponse("The 'name' field length should be less then 20 characters"));
         }
 
         String lastName = (String) employeeMap.get(Employee.LAST_NAME_FIELD);
+        if (name != null && lastName.length() < 1) {
+            return ResponseEntity.badRequest()
+                    .body(createErrorResponse("The 'lastName' field must have at least then 1 character"));
+        }
         if (lastName != null && lastName.length() > 100) {
-            errorResponse.put("error", "The 'lastName' field length should be less then 100 characters");
-            return ResponseEntity.badRequest().body(errorResponse);
+            return ResponseEntity.badRequest()
+                    .body(createErrorResponse("The 'lastName' field length should be less then 100 characters"));
         }
 
         for (String key : employeeMap.keySet()) {
