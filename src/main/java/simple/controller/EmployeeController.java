@@ -31,7 +31,7 @@ public class EmployeeController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = Employee.class))
             )
     )
-    public List<Employee> getList() {
+    public ResponseEntity<List<Employee>> getList() {
         return employeeService.getEmployeeList();
     }
 
