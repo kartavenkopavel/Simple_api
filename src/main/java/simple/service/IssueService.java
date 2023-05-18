@@ -9,11 +9,12 @@ import simple.entity.Employee;
 import simple.entity.Issue;
 import simple.repository.IssueRepository;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static simple.service.ServiceUtils.*;
 
 @Service
 public class IssueService {
@@ -26,14 +27,24 @@ public class IssueService {
 
     public ResponseEntity<Object> createIssue(Issue issue) {
         if (issue.getTitle() == null) {
-            Map<String, String> errorResponse = new HashMap<>();
-            errorResponse.put("error", "The 'title' field is required");
-            return ResponseEntity.badRequest().body(errorResponse);
+            return ResponseEntity.badRequest()
+                    .body(createErrorResponse("The 'title' field is required"));
+        }
+        if (issue.getTitle().length() < 1) {
+            return ResponseEntity.badRequest()
+                    .body(createErrorResponse("The 'title' field must have at least then 1 character"));
+        }
+        if (issue.getTitle().length() > 100) {
+            return ResponseEntity.badRequest()
+                    .body(createErrorResponse("The 'title' field length should be less then 100 characters"));
+        }
+        if (issue.getDescription() != null && issue.getDescription().length() > 1000) {
+            return ResponseEntity.badRequest()
+                    .body(createErrorResponse("The 'description' field length should be less then 1000 characters"));
         }
         if (issue.getEmployee() == null || issue.getEmployee().getId() == null) {
-            Map<String, String> errorResponse = new HashMap<>();
-            errorResponse.put("error", "The 'id' field is required");
-            return ResponseEntity.badRequest().body(errorResponse);
+            return ResponseEntity.badRequest()
+                    .body(createErrorResponse("The employee 'id' field is required"));
         }
 
         Employee employee = employeeService.getEmployeeById(issue.getEmployee().getId());
@@ -48,13 +59,23 @@ public class IssueService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
-    public ResponseEntity<Object> editIssueDescription(Map<String, Object> issueMap, Long id) {
+    public ResponseEntity<Object> editIssue(Map<String, Object> issueMap, Long id) {
         Issue issue = getIssueById(id);
 
-        if (issueMap.get(Issue.TITLE_FIELD) == null) {
-            Map<String, String> errorResponse = new HashMap<>();
-            errorResponse.put("error", "The 'title' field is required");
-            return ResponseEntity.badRequest().body(errorResponse);
+        String title = (String) issueMap.get(Issue.TITLE_FIELD);
+        if (title.length() < 1) {
+            return ResponseEntity.badRequest()
+                    .body(createErrorResponse("The 'title' field must have at least then 1 character"));
+        }
+        if (title.length() > 100) {
+            return ResponseEntity.badRequest()
+                    .body(createErrorResponse("The 'title' field length should be less then 100 characters"));
+        }
+
+        String description = (String) issueMap.get(Issue.DESCRIPTION_FIELD);
+        if (description != null && description.length() > 1000) {
+            return ResponseEntity.badRequest()
+                    .body(createErrorResponse("The 'description' field length should be less then 1000 characters"));
         }
 
         for (String key : issueMap.keySet()) {
@@ -72,13 +93,13 @@ public class IssueService {
         return ResponseEntity.status(HttpStatus.OK).body(savedIssue);
     }
 
-    public List<Issue> getEmployeeIssues(Long id) {
+    public ResponseEntity<List<Issue>> getEmployeeIssues(Long id) {
         Employee employee = employeeService.getEmployeeById(id);
 
-        return issueRepository.findByEmployee(employee);
+        return ResponseEntity.status(HttpStatus.OK).body(issueRepository.findByEmployee(employee));
     }
 
-    public List<Issue> search(String query) {
+    public ResponseEntity<List<Issue>> search(String query) {
         List<Issue> issueList = issueRepository.findAll();
         String lowerCaseQuery = query.toLowerCase();
 
@@ -89,14 +110,14 @@ public class IssueService {
                     post.getEmployee().getLastName().toLowerCase().contains(lowerCaseQuery))
                 .collect(Collectors.toList());
 
-        return issueList;
+        return ResponseEntity.status(HttpStatus.OK).body(issueList);
     }
 
-    public List<Issue> getIssueList() {
-        return issueRepository.findAll();
+    public ResponseEntity<List<Issue>> getIssueList() {
+        return ResponseEntity.status(HttpStatus.OK).body(issueRepository.findAll());
     }
 
-    public ResponseEntity<Void> remove(Long id) {
+    public ResponseEntity<Void> removeIssue(Long id) {
         Optional<Issue> optionalPost = issueRepository.findById(id);
         if (optionalPost.isPresent()) {
             issueRepository.deleteById(id);
