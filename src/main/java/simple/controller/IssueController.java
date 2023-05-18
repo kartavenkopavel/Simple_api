@@ -55,7 +55,7 @@ public class IssueController {
                     )
             }
     )
-    public List<Issue> getEmployeePosts(@PathVariable Long id) {
+    public ResponseEntity<List<Issue>> getEmployeePosts(@PathVariable Long id) {
         return issueService.getEmployeeIssues(id);
     }
 
@@ -72,7 +72,7 @@ public class IssueController {
                     )
             }
     )
-    public List<Issue> search(@RequestParam("q") String query) {
+    public ResponseEntity<List<Issue>> search(@RequestParam("q") String query) {
         return issueService.search(query);
     }
 
@@ -110,7 +110,7 @@ public class IssueController {
             }
     )
     public ResponseEntity<Object> edit(@RequestBody Map<String, Object> issueMap, @PathVariable Long id) {
-        return issueService.editIssueDescription(issueMap, id);
+        return issueService.editIssue(issueMap, id);
     }
 
     @GetMapping("/list")
@@ -125,7 +125,7 @@ public class IssueController {
                     )
             }
     )
-    public List<Issue> getList() {
+    public ResponseEntity<List<Issue>> getList() {
         return issueService.getIssueList();
     }
 
@@ -141,6 +141,6 @@ public class IssueController {
             }
     )
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        return issueService.remove(id);
+        return issueService.removeIssue(id);
     }
 }

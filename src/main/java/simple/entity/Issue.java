@@ -3,6 +3,7 @@ package simple.entity;
 import lombok.*;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.util.List;
 
 @Entity
@@ -26,7 +27,7 @@ public class Issue {
     private Long id;
 
     @Column(name = TITLE_FIELD, length = 100)
-    @NonNull
+    @Size(min = 1, message = "The 'title' field must have at least then 1 character")
     private String title;
 
     @Column(name = DESCRIPTION_FIELD, length = 1000)
@@ -34,7 +35,6 @@ public class Issue {
 
     @ManyToOne
     @JoinColumn(name = USER_FIELD)
-    @NonNull
     private Employee employee;
 
     @OneToMany
