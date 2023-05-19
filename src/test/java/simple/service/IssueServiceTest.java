@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 import simple.entity.Employee;
 import simple.entity.Issue;
+import simple.repository.EmployeeRepository;
 import simple.repository.IssueRepository;
 
 import java.util.*;
@@ -28,6 +29,9 @@ class IssueServiceTest {
     @Mock
     EmployeeService employeeService;
 
+    @Mock
+    EmployeeRepository employeeRepository;
+
     private Employee getExistingEmployee() {
         return Employee.builder()
                 .id(1L)
@@ -38,44 +42,42 @@ class IssueServiceTest {
 
     @Test
     void createIssue_WithValidData_ReturnsCreateResponseEntity() {
+        var employeeId = 1L;
         var issue = Issue.builder()
                 .title("Title")
                 .description("description")
-                .employee(getExistingEmployee())
                 .build();
-        var savedIssue = Issue.builder()
-                .id(1L)
-                .title("Title")
-                .description("Description")
-                .employee(getExistingEmployee())
-                .build();
+        Employee employee = new Employee();
 
-        doReturn(getExistingEmployee()).when(employeeService).getEmployeeById(issue.getEmployee().getId());
-        doReturn(savedIssue).when(issueRepository).save(issue);
+        doReturn(employee).when(employeeService).getEmployeeById(employeeId);
+        doReturn(issue).when(issueRepository).save(issue);
+        doReturn(employee).when(employeeRepository).save(employee);
 
-        var responseEntity = issueService.createIssue(issue);
+        var responseEntity = issueService.createIssue(employeeId, issue);
 
         assertNotNull(responseEntity);
         assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
-        assertEquals(savedIssue, responseEntity.getBody());
+        assertEquals(issue, responseEntity.getBody());
+
+        verify(issueRepository, times(1)).save(issue);
+        verify(employeeRepository, times(1)).save(employee);
     }
 
     @Test
     void createIssue_WithMissingDescription_ReturnsCreateResponseEntity() {
+        var employeeId = 1L;
         var issue = Issue.builder()
                 .title("Title")
-                .employee(getExistingEmployee())
                 .build();
         var savedIssue = Issue.builder()
                 .id(1L)
                 .title("Title")
-                .employee(getExistingEmployee())
                 .build();
 
-        doReturn(getExistingEmployee()).when(employeeService).getEmployeeById(issue.getEmployee().getId());
+        doReturn(getExistingEmployee()).when(employeeService).getEmployeeById(employeeId);
         doReturn(savedIssue).when(issueRepository).save(issue);
 
-        var responseEntity = issueService.createIssue(issue);
+        var responseEntity = issueService.createIssue(employeeId, issue);
 
         assertNotNull(responseEntity);
         assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
@@ -84,12 +86,12 @@ class IssueServiceTest {
 
     @Test
     void createIssue_WithMissingTitle_ReturnsBadRequestResponseEntity() {
+        var employeeId = 1L;
         var issue = Issue.builder()
                 .description("description")
-                .employee(getExistingEmployee())
                 .build();
 
-        var responseEntity = issueService.createIssue(issue);
+        var responseEntity = issueService.createIssue(employeeId, issue);
 
         assertNotNull(responseEntity);
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
@@ -103,13 +105,13 @@ class IssueServiceTest {
 
     @Test
     void createIssue_WithEmptyTitle_ReturnsBadRequestResponseEntity() {
+        var employeeId = 1L;
         var issue = Issue.builder()
                 .title("")
                 .description("description")
-                .employee(getExistingEmployee())
                 .build();
 
-        var responseEntity = issueService.createIssue(issue);
+        var responseEntity = issueService.createIssue(employeeId, issue);
 
         assertNotNull(responseEntity);
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
@@ -123,14 +125,14 @@ class IssueServiceTest {
 
     @Test
     void createIssue_WithInvalidTitle_ReturnsBadRequestResponseEntity() {
+        var employeeId = 1L;
         var issue = Issue.builder()
                 .title("Welcome to a world where limitless possibilities await, where the boundless realm of" +
                         " imagination intertwines with reality, and where dreams blossom into tangible achievements")
                 .description("description")
-                .employee(getExistingEmployee())
                 .build();
 
-        var responseEntity = issueService.createIssue(issue);
+        var responseEntity = issueService.createIssue(employeeId, issue);
 
         assertNotNull(responseEntity);
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
@@ -144,6 +146,7 @@ class IssueServiceTest {
 
     @Test
     void createIssue_WithInvalidDescription_ReturnsBadRequestResponseEntity() {
+        var employeeId = 1L;
         var issue = Issue.builder()
                 .title("Title")
                 .description("Amidst the verdant splendor of an ancient and mystical forest, a breathtaking "
@@ -162,10 +165,9 @@ class IssueServiceTest {
                         + " comprehension. It became a living conduit for the dreams and aspirations of all who dared"
                         + " to believe, spinning a tapestry of dreams and enchantment that forever altered the destinies"
                         + " of those touched by its ethereal grace")
-                .employee(getExistingEmployee())
                 .build();
 
-        var responseEntity = issueService.createIssue(issue);
+        var responseEntity = issueService.createIssue(employeeId, issue);
 
         assertNotNull(responseEntity);
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
@@ -179,21 +181,19 @@ class IssueServiceTest {
 
     @Test
     void createIssue_WithMissingEmployee_ReturnsBadRequestResponseEntity() {
+        Long employeeId = null;
         var issue = Issue.builder()
                 .title("Title")
                 .description("description")
                 .build();
 
-        var responseEntity = issueService.createIssue(issue);
+        var responseEntity = issueService.createIssue(employeeId, issue);
 
         assertNotNull(responseEntity);
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
 
-        var errorResponse = (Map<String, String>) responseEntity.getBody();
-        assertNotNull(errorResponse);
-        assertEquals(1, errorResponse.size());
-        assertTrue(errorResponse.containsKey("error"));
-        assertEquals("The employee 'id' field is required", errorResponse.get("error"));
+        verify(issueRepository, never()).save(issue);
+        verify(employeeRepository, never()).save(any());
     }
 
     @Test
@@ -203,7 +203,6 @@ class IssueServiceTest {
                 .id(id)
                 .title("Title")
                 .description("description")
-                .employee(getExistingEmployee())
                 .build();
 
         doReturn(Optional.of(existingIssue)).when(issueRepository).findById(id);
@@ -235,13 +234,11 @@ class IssueServiceTest {
                         .id(1L)
                         .title("Title")
                         .description("Description")
-                        .employee(getExistingEmployee())
                         .build(),
                 Issue.builder()
                         .id(2L)
                         .title("Title")
                         .description("Description")
-                        .employee(getExistingEmployee())
                         .build()
         );
 
@@ -331,13 +328,11 @@ class IssueServiceTest {
                         .id(1L)
                         .title("Title")
                         .description("Description")
-                        .employee(getExistingEmployee())
                         .build(),
                 Issue.builder()
                         .id(2L)
                         .title("Topic")
                         .description("Description")
-                        .employee(getExistingEmployee())
                         .build()
         );
         var emptyList = List.of();
@@ -359,13 +354,11 @@ class IssueServiceTest {
                         .id(1L)
                         .title("Title")
                         .description("Description")
-                        .employee(getExistingEmployee())
                         .build(),
                 Issue.builder()
                         .id(2L)
                         .title("Topic")
                         .description("Description")
-                        .employee(getExistingEmployee())
                         .build()
         );
 
@@ -387,7 +380,6 @@ class IssueServiceTest {
                 .id(id)
                 .title("Title")
                 .description("Description")
-                .employee(getExistingEmployee())
                 .build();
         Map<String, Object> issueMap = new HashMap<>();
         issueMap.put(Issue.TITLE_FIELD, "Title edited");
@@ -411,7 +403,6 @@ class IssueServiceTest {
         var existingIssue = Issue.builder()
                 .id(id)
                 .title("Title")
-                .employee(getExistingEmployee())
                 .build();
         Map<String, Object> issueMap = new HashMap<>();
         issueMap.put(Issue.TITLE_FIELD, "Title edited");
@@ -436,7 +427,6 @@ class IssueServiceTest {
                 .id(id)
                 .title("Title")
                 .description("Description")
-                .employee(getExistingEmployee())
                 .build();
         Map<String, Object> issueMap = new HashMap<>();
         issueMap.put(Issue.TITLE_FIELD, "Title edited");
@@ -461,7 +451,6 @@ class IssueServiceTest {
                 .id(id)
                 .title("Title")
                 .description("Description")
-                .employee(getExistingEmployee())
                 .build();
         Map<String, Object> issueMap = new HashMap<>();
         issueMap.put(Issue.TITLE_FIELD, "Title edited");
@@ -485,7 +474,6 @@ class IssueServiceTest {
                 .id(id)
                 .title("Title")
                 .description("Description")
-                .employee(getExistingEmployee())
                 .build();
         Map<String, Object> issueMap = new HashMap<>();
         issueMap.put(Issue.TITLE_FIELD, "");
@@ -512,7 +500,6 @@ class IssueServiceTest {
                 .id(id)
                 .title("Title")
                 .description("description")
-                .employee(getExistingEmployee())
                 .build();
         Map<String, Object> issueMap = new HashMap<>();
         issueMap.put(Issue.TITLE_FIELD, "Welcome to a world where limitless possibilities await, where the boundless realm of" +
@@ -540,7 +527,6 @@ class IssueServiceTest {
                 .id(id)
                 .title("Title")
                 .description("description")
-                .employee(getExistingEmployee())
                 .build();
         Map<String, Object> issueMap = new HashMap<>();
         issueMap.put(Issue.TITLE_FIELD, "Title edited");
@@ -581,7 +567,6 @@ class IssueServiceTest {
                 .id(id)
                 .title("Title")
                 .description("Description")
-                .employee(getExistingEmployee())
                 .build();
 
         doReturn(Optional.of(existingIssue)).when(issueRepository).findById(id);

@@ -7,11 +7,12 @@ import org.springframework.stereotype.Service;
 import simple.entity.Comment;
 import simple.entity.Issue;
 import simple.repository.CommentRepository;
+import simple.repository.IssueRepository;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
+
+import static simple.service.ServiceUtils.createErrorResponse;
 
 @Service
 public class CommentService {
@@ -20,26 +21,31 @@ public class CommentService {
     private IssueService issueService;
 
     @Autowired
+    private IssueRepository issueRepository;
+
+    @Autowired
     private CommentRepository commentRepository;
 
-    public ResponseEntity<?> createComment(Comment comment) {
-        Map<String, String> errorResponse = new HashMap<>();
+    public ResponseEntity<Object> createComment(Long issueId, Comment comment) {
+        if (issueId == null) {
+            return ResponseEntity.badRequest()
+                    .body(createErrorResponse("The 'issueId' param is required"));
+        }
+        Issue issue = issueService.getIssueById(issueId);
+
         if (comment.getText() == null) {
-            errorResponse.put("error", "The 'text' field is required");
-            return ResponseEntity.badRequest().body(errorResponse);
+            return ResponseEntity.badRequest()
+                    .body(createErrorResponse("The 'text' field is required"));
         }
         if (comment.getText().length() > 400) {
-            errorResponse.put("error", "The 'text' field length should be less than 400 characters");
-            return ResponseEntity.badRequest().body(errorResponse);
-        }
-        if (comment.getIssue() == null) {
-            errorResponse.put("error", "The 'issue' field is required");
-            return ResponseEntity.badRequest().body(errorResponse);
+            return ResponseEntity.badRequest()
+                    .body(createErrorResponse("The 'text' field length should be less than 400 characters"));
         }
 
-        Issue issue = issueService.getIssueById(comment.getIssue().getId());
         comment.setIssue(issue);
         Comment savedComment = commentRepository.save(comment);
+        issue.addComment(savedComment);
+        issueRepository.save(issue);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(savedComment);
     }

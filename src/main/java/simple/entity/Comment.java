@@ -1,5 +1,6 @@
 package simple.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -31,6 +32,7 @@ public class Comment {
 
     @ManyToOne
     @JoinColumn(name = POST_FIELD)
+    @JsonIgnore
     private Issue issue;
 
 }

@@ -10,7 +10,6 @@ import simple.repository.EmployeeRepository;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static simple.service.ServiceUtils.*;
 
@@ -57,35 +56,6 @@ public class EmployeeService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
-    public ResponseEntity<Object> updateEmployee(Employee employee) {
-        getEmployeeById(employee.getId());
-
-        if (employee.getName() == null || employee.getLastName() == null) {
-            return ResponseEntity.badRequest()
-                    .body(createErrorResponse("The 'name' and 'lastName' fields is required"));
-        }
-        if (employee.getName().length() < 1) {
-            return ResponseEntity.badRequest()
-                    .body(createErrorResponse("The 'name' field must have at least then 1 character"));
-        }
-        if (employee.getLastName().length() < 1) {
-            return ResponseEntity.badRequest()
-                    .body(createErrorResponse("The 'lastName' field must have at least then 1 character"));
-        }
-        if (employee.getName().length() > 20) {
-            return ResponseEntity.badRequest()
-                    .body(createErrorResponse("The 'name' field length should be less then 20 characters"));
-        }
-        if (employee.getLastName().length() > 100) {
-            return ResponseEntity.badRequest()
-                    .body(createErrorResponse("The 'lastName' field length should be less then 100 characters"));
-        }
-
-        Employee savedEmployee = employeeRepository.save(employee);
-
-        return ResponseEntity.status(HttpStatus.OK).body(savedEmployee);
-    }
-
     public ResponseEntity<Object> editEmployee(Map<String, Object> employeeMap, Long id) {
         Employee employee = getEmployeeById(id);
 
@@ -126,13 +96,15 @@ public class EmployeeService {
         return ResponseEntity.status(HttpStatus.OK).body(savedEmployee);
     }
 
-    public ResponseEntity<Void> remove(Long id) {
-        Optional<Employee> optionalEmployee = employeeRepository.findById(id);
-        if (optionalEmployee.isPresent()){
+    public ResponseEntity<Object> remove(Long id) {
+        Employee employee = getEmployeeById(id);
+
+        if (employee.getIssues() == null || employee.getIssues().isEmpty()) {
             employeeRepository.deleteById(id);
             return ResponseEntity.ok().build();
         } else {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.badRequest()
+                    .body(createErrorResponse("The employee has active issues"));
         }
     }
 }
