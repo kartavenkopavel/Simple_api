@@ -7,10 +7,8 @@ import lombok.Setter;
 @Setter
 @Getter
 public class IssueRequest {
-    @Schema(required = true, example = "1")
-    private Long id;
-    @Schema(maxLength = 100)
+    @Schema(minLength = 1, maxLength = 100, required = true)
     private String title;
-    @Schema(maxLength = 1000)
+    @Schema(minLength = 1, maxLength = 1000)
     private String description;
 }

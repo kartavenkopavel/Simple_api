@@ -7,9 +7,8 @@ import lombok.Setter;
 @Setter
 @Getter
 public class EmployeeRequest {
-    private Long id;
-    @Schema(maxLength = 20)
+    @Schema(minLength = 1, maxLength = 20, required = true)
     private String name;
-    @Schema(maxLength = 100)
+    @Schema(minLength = 1, maxLength = 100, required = true)
     private String lastName;
 }

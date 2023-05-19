@@ -25,8 +25,8 @@ public class Comment {
     @Column(name = COMMENT_ID_FIELD)
     private Long id;
 
-    @Column(name = COMMENT_TEXT_FIELD, length = 400)
-    @Size(min = 1, message = "The 'text' field must have at least then 1 character")
+    @Column(name = COMMENT_TEXT_FIELD)
+    @Size(min = 1, max = 400)
     private String text;
 
     @Column(name = COMMENT_LIKES_FIELD)
