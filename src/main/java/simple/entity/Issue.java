@@ -29,11 +29,12 @@ public class Issue {
     @Column(name = ID_FIELD)
     private Long id;
 
-    @Column(name = TITLE_FIELD, length = 100)
-    @Size(min = 1, message = "The 'title' field must have at least then 1 character")
+    @Column(name = TITLE_FIELD)
+    @Size(min = 1, max = 100)
     private String title;
 
-    @Column(name = DESCRIPTION_FIELD, length = 1000)
+    @Column(name = DESCRIPTION_FIELD)
+    @Size(min = 1, max = 1000)
     private String description;
 
     @ManyToOne

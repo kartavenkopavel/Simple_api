@@ -31,12 +31,12 @@ public class Employee {
     @Column(name = ID_FIELD)
     private Long id;
 
-    @Column(name = NAME_FIELD, length = 20)
-    @Size(min = 1, message = "The 'name' field must have at least then 1 character")
+    @Column(name = NAME_FIELD)
+    @Size(min = 1, max = 20)
     private String name;
 
-    @Column(name = LAST_NAME_FIELD, length = 100)
-    @Size(min = 1, message = "The 'lastName' field must have at least then 1 character")
+    @Column(name = LAST_NAME_FIELD)
+    @Size(min = 1, max = 100)
     private String lastName;
 
     @Column(name = CREATED_AT_FIELD)

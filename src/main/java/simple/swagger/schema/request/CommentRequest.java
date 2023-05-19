@@ -7,8 +7,7 @@ import lombok.Setter;
 @Setter
 @Getter
 public class CommentRequest {
-    @Schema(example = "Some text", maxLength = 400)
+    @Schema(minLength = 1, maxLength = 400, required = true)
     private String text;
     private int likes;
-    private IssueRequest issue;
 }
