@@ -37,6 +37,10 @@ public class CommentService {
             return ResponseEntity.badRequest()
                     .body(createErrorResponse("The 'text' field is required"));
         }
+        if (comment.getText().length() < 1) {
+            return ResponseEntity.badRequest()
+                    .body(createErrorResponse("The 'text' field must have at least then 1 character"));
+        }
         if (comment.getText().length() > 400) {
             return ResponseEntity.badRequest()
                     .body(createErrorResponse("The 'text' field length should be less than 400 characters"));
@@ -50,9 +54,9 @@ public class CommentService {
         return ResponseEntity.status(HttpStatus.CREATED).body(savedComment);
     }
 
-    public List<Comment> getIssueComments(Long id) {
+    public ResponseEntity<List<Comment>> getIssueComments(Long id) {
         Issue issue = issueService.getIssueById(id);
-        return commentRepository.findByIssue(issue);
+        return ResponseEntity.status(HttpStatus.OK).body(commentRepository.findByIssue(issue));
     }
 
     public ResponseEntity<Void> deleteComment(Long id) {

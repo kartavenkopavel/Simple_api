@@ -55,7 +55,7 @@ public class CommentController {
                     )
             }
     )
-    public List<Comment> getIssueComments(@PathVariable Long id) {
+    public ResponseEntity<List<Comment>> getIssueComments(@PathVariable Long id) {
         return commentService.getIssueComments(id);
     }
 
