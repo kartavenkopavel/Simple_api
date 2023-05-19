@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 
 @Entity
 @Builder
@@ -25,6 +26,7 @@ public class Comment {
     private Long id;
 
     @Column(name = COMMENT_TEXT_FIELD, length = 400)
+    @Size(min = 1, message = "The 'text' field must have at least then 1 character")
     private String text;
 
     @Column(name = COMMENT_LIKES_FIELD)
