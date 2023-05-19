@@ -68,24 +68,6 @@ public class EmployeeController {
         return employeeService.createEmployee(employee);
     }
 
-    @PutMapping("/update")
-    @Operation(
-            tags = "Employee",
-            operationId = "employee",
-            summary = "Update employee",
-            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    content = @Content(schema = @Schema(implementation = EmployeeRequest.class))
-            ),
-            responses = @ApiResponse(
-                    responseCode = "200",
-                    description = "OK",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = Employee.class))
-            )
-    )
-    public ResponseEntity<Object> update(@RequestBody Employee employee) {
-        return employeeService.updateEmployee(employee);
-    }
-
     @PatchMapping("/edit/{id}")
     @Operation(
             tags = "Employee",
@@ -114,7 +96,7 @@ public class EmployeeController {
                     description = "OK"
             )
     )
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Object> delete(@PathVariable Long id) {
         return employeeService.remove(id);
     }
 }

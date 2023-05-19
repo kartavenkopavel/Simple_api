@@ -38,8 +38,8 @@ public class IssueController {
                     )
             }
     )
-    public ResponseEntity<Object> createIssue(@RequestBody Issue issue) {
-        return issueService.createIssue(issue);
+    public ResponseEntity<Object> create(@RequestParam("employeeId") Long id, @RequestBody Issue issue) {
+        return issueService.createIssue(id, issue);
     }
 
     @GetMapping("/employee/{id}/list")

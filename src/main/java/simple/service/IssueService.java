@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import simple.entity.Employee;
 import simple.entity.Issue;
+import simple.repository.EmployeeRepository;
 import simple.repository.IssueRepository;
 
 import java.util.List;
@@ -23,9 +24,18 @@ public class IssueService {
     private IssueRepository issueRepository;
 
     @Autowired
+    private EmployeeRepository employeeRepository;
+
+    @Autowired
     private EmployeeService employeeService;
 
-    public ResponseEntity<Object> createIssue(Issue issue) {
+    public ResponseEntity<Object> createIssue(Long employeeId, Issue issue) {
+        if (employeeId == null) {
+            return ResponseEntity.badRequest()
+                    .body(createErrorResponse("The 'employeeId' param is required"));
+        }
+        Employee employee = employeeService.getEmployeeById(employeeId);
+
         if (issue.getTitle() == null) {
             return ResponseEntity.badRequest()
                     .body(createErrorResponse("The 'title' field is required"));
@@ -42,15 +52,13 @@ public class IssueService {
             return ResponseEntity.badRequest()
                     .body(createErrorResponse("The 'description' field length should be less then 1000 characters"));
         }
-        if (issue.getEmployee() == null || issue.getEmployee().getId() == null) {
-            return ResponseEntity.badRequest()
-                    .body(createErrorResponse("The employee 'id' field is required"));
-        }
 
-        Employee employee = employeeService.getEmployeeById(issue.getEmployee().getId());
+
         issue.setEmployee(employee);
-
         Issue savedIssue = issueRepository.save(issue);
+        employee.addIssue(savedIssue);
+        employeeRepository.save(employee);
+
         return ResponseEntity.status(HttpStatus.CREATED).body(savedIssue);
     }
 
@@ -104,10 +112,10 @@ public class IssueService {
         String lowerCaseQuery = query.toLowerCase();
 
         issueList = issueList.stream()
-                .filter(post -> post.getTitle().toLowerCase().contains(lowerCaseQuery) ||
-                    post.getDescription().toLowerCase().contains(lowerCaseQuery) ||
-                    post.getEmployee().getName().toLowerCase().contains(lowerCaseQuery) ||
-                    post.getEmployee().getLastName().toLowerCase().contains(lowerCaseQuery))
+                .filter(issue -> issue.getTitle().toLowerCase().contains(lowerCaseQuery) ||
+                    issue.getDescription().toLowerCase().contains(lowerCaseQuery) ||
+                    issue.getEmployee().getName().toLowerCase().contains(lowerCaseQuery) ||
+                    issue.getEmployee().getLastName().toLowerCase().contains(lowerCaseQuery))
                 .collect(Collectors.toList());
 
         return ResponseEntity.status(HttpStatus.OK).body(issueList);

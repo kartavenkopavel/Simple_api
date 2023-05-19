@@ -37,8 +37,8 @@ public class CommentController {
                     )
             }
     )
-    public ResponseEntity<?> create(@RequestBody Comment comment) {
-       return commentService.createComment(comment);
+    public ResponseEntity<Object> create(@RequestParam("issueId") Long id, @RequestBody Comment comment) {
+       return commentService.createComment(id, comment);
     }
 
     @GetMapping("/issue/{id}/list")

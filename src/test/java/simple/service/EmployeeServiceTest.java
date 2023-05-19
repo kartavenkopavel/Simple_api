@@ -6,9 +6,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.server.ResponseStatusException;
 import simple.entity.Employee;
+import simple.entity.Issue;
 import simple.repository.EmployeeRepository;
 
 import java.util.*;
@@ -206,168 +206,6 @@ class EmployeeServiceTest {
     }
 
     @Test
-    void updateEmployee_WithValidData_ReturnsOkResponseEntity() {
-        var id = 1L;
-        var employee = Employee.builder()
-                .id(id)
-                .name("Ivan")
-                .lastName("Ivanov")
-                .build();
-        var updatedEmployee = Employee.builder()
-                .id(id)
-                .name("Ivan Updated")
-                .lastName("Ivanov Updated")
-                .build();
-
-        doReturn(Optional.of(employee)).when(employeeRepository).findById(id);
-        doReturn(updatedEmployee).when(employeeRepository).save(updatedEmployee);
-
-        var responseEntity = service.updateEmployee(updatedEmployee);
-
-        assertNotNull(responseEntity);
-        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        assertEquals(updatedEmployee, responseEntity.getBody());
-    }
-
-    @Test
-    void updateEmployee_WithMissingNameAndLastName_ReturnsBadRequestResponseEntity() {
-        var id = 1L;
-        var employee = Employee.builder()
-                .id(id)
-                .name("Ivan")
-                .lastName("Ivanov")
-                .build();
-        var updatedEmployee = Employee.builder()
-                .id(id)
-                .build();
-
-        doReturn(Optional.of(employee)).when(employeeRepository).findById(id);
-
-        var responseEntity = service.updateEmployee(updatedEmployee);
-
-        assertNotNull(responseEntity);
-        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
-
-        var errorResponse = (Map<String, String>) responseEntity.getBody();
-        assertNotNull(errorResponse);
-        assertEquals(1, errorResponse.size());
-        assertTrue(errorResponse.containsKey("error"));
-        assertEquals("The 'name' and 'lastName' fields is required", errorResponse.get("error"));
-    }
-
-    @Test
-    void updateEmployee_WithEmptyName_ReturnsBadRequestResponseEntity() {
-        var id = 1L;
-        Employee employee = Employee.builder()
-                .id(id)
-                .name("Ivan")
-                .lastName("Ivanov")
-                .build();
-        var updatedEmployee = Employee.builder()
-                .id(id)
-                .name("")
-                .lastName("Ivanov")
-                .build();
-
-        doReturn(Optional.of(employee)).when(employeeRepository).findById(id);
-
-        ResponseEntity<Object> responseEntity = service.updateEmployee(updatedEmployee);
-
-        assertNotNull(responseEntity);
-        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
-
-        var errorResponse = (Map<String, String>) responseEntity.getBody();
-        assertNotNull(errorResponse);
-        assertEquals(1, errorResponse.size());
-        assertTrue(errorResponse.containsKey("error"));
-        assertEquals("The 'name' field must have at least then 1 character", errorResponse.get("error"));
-    }
-
-    @Test
-    void updateEmployee_WithEmptyLastName_ReturnsBadRequestResponseEntity() {
-        var id = 1L;
-        var employee = Employee.builder()
-                .id(id)
-                .name("Ivan")
-                .lastName("Ivanov")
-                .build();
-        var updatedEmployee = Employee.builder()
-                .id(id)
-                .name("Ivan")
-                .lastName("")
-                .build();
-
-        doReturn(Optional.of(employee)).when(employeeRepository).findById(id);
-
-        var responseEntity = service.updateEmployee(updatedEmployee);
-
-        assertNotNull(responseEntity);
-        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
-
-        var errorResponse = (Map<String, String>) responseEntity.getBody();
-        assertNotNull(errorResponse);
-        assertEquals(1, errorResponse.size());
-        assertTrue(errorResponse.containsKey("error"));
-        assertEquals("The 'lastName' field must have at least then 1 character", errorResponse.get("error"));
-    }
-
-    @Test
-    void updateEmployee_WithInvalidName_ReturnsBadRequestResponseEntity() {
-        var id = 1L;
-        var employee = Employee.builder()
-                .id(id)
-                .name("Ivan")
-                .lastName("Ivanov")
-                .build();
-        var updatedEmployee = Employee.builder()
-                .id(id)
-                .name("This is a very long name that exceeds the maximum length")
-                .lastName("Ivanov")
-                .build();
-
-        doReturn(Optional.of(employee)).when(employeeRepository).findById(id);
-
-        var responseEntity = service.updateEmployee(updatedEmployee);
-
-        assertNotNull(responseEntity);
-        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
-
-        var errorResponse = (Map<String, String>) responseEntity.getBody();
-        assertNotNull(errorResponse);
-        assertEquals(1, errorResponse.size());
-        assertTrue(errorResponse.containsKey("error"));
-        assertEquals("The 'name' field length should be less then 20 characters", errorResponse.get("error"));
-    }
-
-    @Test
-    void updateEmployee_WithInvalidLastName_ReturnsBadRequestResponseEntity() {
-        var id = 1L;
-        var employee = Employee.builder()
-                .id(id)
-                .name("Ivan")
-                .lastName("Ivanov")
-                .build();
-        var updatedEmployee = Employee.builder()
-                .id(id)
-                .name("Ivan")
-                .lastName("This last name is too long to fit within the maximum allowed length of last names and checks the operation of the method")
-                .build();
-
-        doReturn(Optional.of(employee)).when(employeeRepository).findById(id);
-
-        var responseEntity = service.updateEmployee(updatedEmployee);
-
-        assertNotNull(responseEntity);
-        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
-
-        var errorResponse = (Map<String, String>) responseEntity.getBody();
-        assertNotNull(errorResponse);
-        assertEquals(1, errorResponse.size());
-        assertTrue(errorResponse.containsKey("error"));
-        assertEquals("The 'lastName' field length should be less then 100 characters", errorResponse.get("error"));
-    }
-
-    @Test
     void editEmployee_WithValidName_ReturnsOkResponseEntity() {
         var id = 1L;
         var existingEmployee = Employee.builder()
@@ -517,18 +355,49 @@ class EmployeeServiceTest {
     }
 
     @Test
+    void removeEmployee_WithExistingIssueInEmployee_ReturnsBadRequestResponseEntity() {
+        var id = 1L;
+        var existingEmployee = Employee.builder()
+                .id(id)
+                .name("Ivan")
+                .lastName("Ivanov")
+                .issues(List.of(Issue.builder()
+                        .title("title")
+                        .description("description")
+                        .build()
+                        )      )
+                .build();
+
+        doReturn(Optional.of(existingEmployee)).when(employeeRepository).findById(id);
+
+        var responseEntity = service.remove(id);
+
+        assertNotNull(responseEntity);
+        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+        assertNotNull(responseEntity.getBody());
+
+        var errorResponse = (Map<String, String>) responseEntity.getBody();
+        assertNotNull(errorResponse);
+        assertEquals(1, errorResponse.size());
+        assertTrue(errorResponse.containsKey("error"));
+        assertEquals("The employee has active issues", errorResponse.get("error"));
+
+        verify(employeeRepository, times(1)).findById(id);
+        verify(employeeRepository, never()).deleteById(id);
+    }
+
+    @Test
     void removeEmployee_WithNotExistingEmployee_ReturnsNotFoundResponseEntity() {
         var id = 1L;
 
         doReturn(Optional.empty()).when(employeeRepository).findById(id);
 
-        var responseEntity = service.remove(id);
+        var exception = assertThrows(ResponseStatusException.class, () -> service.remove(id));
 
-        assertNotNull(responseEntity);
-        assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
-        assertNull(responseEntity.getBody());
+        assertNotNull(exception);
+        assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
 
         verify(employeeRepository, times(1)).findById(id);
-        verify(employeeRepository, times(0)).deleteById(id);
+        verify(employeeRepository, never()).deleteById(id);
     }
 }
