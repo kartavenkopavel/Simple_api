@@ -6,7 +6,8 @@ Application was created to test the API for educational purposes. Used stack: ja
 
 * Clone project 
 > `git clone https://github.com/kartavenkopavel/Simple_api.git`
-* Start application from IDEA
+* Start application
+> `mvn spring-boot:run`
 * Access to the server at 
 > http://localhost:8090
 * Authorization via api key is configured on the server. You should use header
@@ -15,5 +16,5 @@ Application was created to test the API for educational purposes. Used stack: ja
 > http://localhost:8090/swagger-ui/index.html (public link)
 * Access to the database at
 > http://localhost:8090/h2-console/ (public link)
-* Or you can use a docker image
-> `docker pull pavelkartavenko/simple-api:1.0.0`
+* Or you can use a docker container
+> `docker run -d -p 8090:8090 pavelkartavenko/simple-api:1.0.1`
